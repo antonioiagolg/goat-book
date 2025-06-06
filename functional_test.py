@@ -36,8 +36,29 @@ class NewVisitorTest(unittest.TestCase):
 
         table = self.browser.find_element(By.ID, "id_list_table")
         trs = table.find_elements(By.TAG_NAME, "tr")
-        self.assertTrue(any(row.text == "Do the dishes" for row in trs), "New to-do item does not appear in the list")
+        self.assertIn(
+            "1: Do the dishes",
+            [row.text for row in trs], 
+        )
+
         # The field is still there for more items
+        inputbox = self.browser.find_element(By.ID, "id_new_item")
+        inputbox.send_keys("Dry the dishes and put them away")
+        inputbox.send_keys(Keys.ENTER)
+        time.sleep(1)
+
+        # The app reloads and shows two items in the list
+        table = self.browser.find_element(By.ID, "id_list_table")
+        trs = table.find_elements(By.TAG_NAME, "tr")
+        self.assertIn(
+            "2: Dry the dishes and put them away ",
+            [row.text for row in trs], 
+        )
+        self.assertIn(
+            "1: Do the dishes",
+            [row.text for row in trs], 
+        )
+
 
         # The user is satisfied and close the app
         self.fail("Finish the tests")
