@@ -13,6 +13,14 @@ class NewVisitorTest(unittest.TestCase):
         self.browser.quit()
         return super().tearDown()
 
+    def check_for_row_in_table(self, row_text) -> None:
+        table = self.browser.find_element(By.ID, "id_list_table")
+        trs = table.find_elements(By.TAG_NAME, "tr")
+        self.assertIn(
+            row_text,
+            [row.text for row in trs], 
+        )
+
     def test_can_start_todo_list(self) -> None:
         # and it navigates to the To-do list app
         self.browser.get("http://localhost:8000")
@@ -34,12 +42,7 @@ class NewVisitorTest(unittest.TestCase):
         inputbox.send_keys(Keys.ENTER)
         time.sleep(1)
 
-        table = self.browser.find_element(By.ID, "id_list_table")
-        trs = table.find_elements(By.TAG_NAME, "tr")
-        self.assertIn(
-            "1: Do the dishes",
-            [row.text for row in trs], 
-        )
+        self.check_for_row_in_table("1: Do the dishes")
 
         # The field is still there for more items
         inputbox = self.browser.find_element(By.ID, "id_new_item")
@@ -48,16 +51,8 @@ class NewVisitorTest(unittest.TestCase):
         time.sleep(1)
 
         # The app reloads and shows two items in the list
-        table = self.browser.find_element(By.ID, "id_list_table")
-        trs = table.find_elements(By.TAG_NAME, "tr")
-        self.assertIn(
-            "2: Dry the dishes and put them away ",
-            [row.text for row in trs], 
-        )
-        self.assertIn(
-            "1: Do the dishes",
-            [row.text for row in trs], 
-        )
+        self.check_for_row_in_table("2: Dry the dishes and put them away")
+        self.check_for_row_in_table("1: Do the dishes")
 
 
         # The user is satisfied and close the app

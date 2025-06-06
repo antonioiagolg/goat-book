@@ -7,3 +7,5 @@
 * Unit tests give us the fast feedback, what are the behaviors we want to have in our feature (the functional test).
 
 * Don't test implementation, but test behaviors (check what we should have, not how we should have)
+
+* Always do a commit before refactor. We might brake things during the refactor, and we need to have a safe checkpoint in case of a huge mess.
