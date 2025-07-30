@@ -13,8 +13,17 @@ class HomePageTest(TestCase):
 
     def test_can_make_post_request(self):
         res = self.client.post('/', data={"item_text": "A new list item"})
-        self.assertContains(res, "A new list item")
-        self.assertTemplateUsed(res, 'home.html')
+
+        self.assertEqual(Item.objects.count(), 1)
+        new_item = Item.objects.first()
+        self.assertEqual(new_item.text, "A new list item")
+
+        self.assertRedirects(res, "/")
+
+
+    def test_only_things_when_necessary(self):
+        res = self.client.get("/")
+        self.assertEqual(Item.objects.count(), 0)
 
 
 class ItemModelTest(TestCase):
