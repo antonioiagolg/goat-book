@@ -54,9 +54,5 @@ class NewVisitorTest(unittest.TestCase):
         self.check_for_row_in_table("2: Dry the dishes and put them away")
         self.check_for_row_in_table("1: Do the dishes")
 
-
-        # The user is satisfied and close the app
-        self.fail("Finish the tests")
-
 if __name__ == "__main__":
     unittest.main()

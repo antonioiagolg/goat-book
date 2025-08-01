@@ -18,6 +18,8 @@ class HomePageTest(TestCase):
         new_item = Item.objects.first()
         self.assertEqual(new_item.text, "A new list item")
 
+    def test_redirects_after_post(self):
+        res = self.client.post('/', data={"item_text": "A new list item"})
         self.assertRedirects(res, "/")
 
 
@@ -25,6 +27,14 @@ class HomePageTest(TestCase):
         res = self.client.get("/")
         self.assertEqual(Item.objects.count(), 0)
 
+    def test_displays_all_list_items(self):
+        Item.objects.create(text="Itemey 1")
+        Item.objects.create(text="Itemey 2")
+
+        res = self.client.get("/")
+
+        self.assertContains(res, "Itemey 1")
+        self.assertContains(res, "Itemey 2")
 
 class ItemModelTest(TestCase):
     def test_saving_retrieving_items(self):
