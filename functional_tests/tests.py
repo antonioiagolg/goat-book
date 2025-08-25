@@ -1,10 +1,11 @@
 import unittest
 import time
+from django.test import LiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
-class NewVisitorTest(unittest.TestCase):
+class NewVisitorTest(LiveServerTestCase):
     def setUp(self) -> None:
         self.browser = webdriver.Firefox()
         return super().setUp()
@@ -23,7 +24,7 @@ class NewVisitorTest(unittest.TestCase):
 
     def test_can_start_todo_list(self) -> None:
         # and it navigates to the To-do list app
-        self.browser.get("http://localhost:8000")
+        self.browser.get(self.live_server_url)
 
         # The user can see that it is in the to-do list app by the title
         self.assertIn("To-Do", self.browser.title)
@@ -54,5 +55,3 @@ class NewVisitorTest(unittest.TestCase):
         self.check_for_row_in_table("2: Dry the dishes and put them away")
         self.check_for_row_in_table("1: Do the dishes")
 
-if __name__ == "__main__":
-    unittest.main()
