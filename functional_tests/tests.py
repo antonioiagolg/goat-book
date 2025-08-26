@@ -2,8 +2,11 @@ import unittest
 import time
 from django.test import LiveServerTestCase
 from selenium import webdriver
+from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+
+MAX_TIME = 5
 
 class NewVisitorTest(LiveServerTestCase):
     def setUp(self) -> None:
@@ -14,13 +17,21 @@ class NewVisitorTest(LiveServerTestCase):
         self.browser.quit()
         return super().tearDown()
 
-    def check_for_row_in_table(self, row_text) -> None:
-        table = self.browser.find_element(By.ID, "id_list_table")
-        trs = table.find_elements(By.TAG_NAME, "tr")
-        self.assertIn(
-            row_text,
-            [row.text for row in trs], 
-        )
+    def wait_for_row_in_table(self, row_text) -> None:
+        start_time = time.time()
+        while True:
+            try:
+                table = self.browser.find_element(By.ID, "id_list_table")
+                trs = table.find_elements(By.TAG_NAME, "tr")
+                self.assertIn(
+                    row_text,
+                    [row.text for row in trs], 
+                )
+                return
+            except (AssertionError, WebDriverException):
+                if time.time() - start_time > MAX_TIME:
+                    raise
+                time.sleep(0.5)
 
     def test_can_start_todo_list(self) -> None:
         # and it navigates to the To-do list app
@@ -43,7 +54,7 @@ class NewVisitorTest(LiveServerTestCase):
         inputbox.send_keys(Keys.ENTER)
         time.sleep(1)
 
-        self.check_for_row_in_table("1: Do the dishes")
+        self.wait_for_row_in_table("1: Do the dishes")
 
         # The field is still there for more items
         inputbox = self.browser.find_element(By.ID, "id_new_item")
@@ -52,6 +63,6 @@ class NewVisitorTest(LiveServerTestCase):
         time.sleep(1)
 
         # The app reloads and shows two items in the list
-        self.check_for_row_in_table("2: Dry the dishes and put them away")
-        self.check_for_row_in_table("1: Do the dishes")
+        self.wait_for_row_in_table("2: Dry the dishes and put them away")
+        self.wait_for_row_in_table("1: Do the dishes")
 
